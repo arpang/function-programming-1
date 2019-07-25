@@ -99,15 +99,10 @@ object FunSets {
     * that satisfies `p`.
     */
   def exists(s: Set, p: Int => Boolean): Boolean = {
-    def iter(a: Int): Boolean = {
-      if (a > bound) false
-      else if (s(a) && p(a)) true
-      else iter(a + 1)
+    def notP(a: Int): Boolean = {
+      !p(a)
     }
-
-    iter(-1 * bound)
-//    transform function
-//    !forall(s, !p)
+    !forall(s, notP)
   }
 
   /**
