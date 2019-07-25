@@ -3,4 +3,5 @@
 *.xml
 *xml*
 */target/*
+*/target*
 *.iml
