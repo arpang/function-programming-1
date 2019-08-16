@@ -94,12 +94,14 @@ object Anagrams {
     * in the example above could have been displayed in some other order.
     */
   def combinations(occurrences: Occurrences): List[Occurrences] = {
-    val occurrencesFiltered = occurrences.filter(_._2 != 0)
-    val result = for {
-      (char, count) <- occurrencesFiltered
-      y <- 0 until count
-    } yield combinations(((char, y) :: occurrencesFiltered.filter(_._1 != char)).sorted)
-    occurrencesFiltered :: result.flatten
+    if (occurrences.isEmpty) return List(Nil)
+    val (char, count) = occurrences.head
+    val tailCombinations = combinations(occurrences.tail)
+    val headCombinations = for {
+      tailCombination <- tailCombinations
+      y <- 1 to count
+    } yield ((char, y) :: tailCombination).sorted
+    headCombinations ++ tailCombinations
   }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
@@ -167,15 +169,16 @@ object Anagrams {
     */
 
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-      def iter(occurrences: Occurrences): List[Sentence] = {
-        if (occurrences.isEmpty) List(Nil)
-        else for {
-          combination <- combinations(occurrences)
-          word <- dictionaryByOccurrences getOrElse (combination, Nil)
-          sentence <- iter(subtract(occurrences, combination))
-        } yield word :: sentence
-      }
-      iter(sentenceOccurrences(sentence))
+    def iter(occurrences: Occurrences): List[Sentence] = {
+      if (occurrences.isEmpty) List(Nil)
+      else for {
+        combination <- combinations(occurrences)
+        word <- dictionaryByOccurrences getOrElse(combination, Nil)
+        sentence <- iter(subtract(occurrences, combination))
+      } yield word :: sentence
     }
+
+    iter(sentenceOccurrences(sentence))
+  }
 
 }
